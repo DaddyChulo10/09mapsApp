@@ -1,6 +1,15 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { LngLat, Map, Marker } from 'mapbox-gl';
 
+interface PlainMarker {
+  color: string;
+  lngLat: number[];
+}
+interface MarkerAndColor {
+  color: string;
+  marker: Marker;
+}
+
 @Component({
   templateUrl: './markers-page.component.html',
   styleUrls: ['./markers-page.component.css']
@@ -9,6 +18,9 @@ export class MarkersPageComponent implements AfterViewInit, OnDestroy {
 
 
   @ViewChild('map') divMap?: ElementRef
+
+
+  public markers: MarkerAndColor[] = []
 
 
   ngOnDestroy(): void {
@@ -38,11 +50,19 @@ export class MarkersPageComponent implements AfterViewInit, OnDestroy {
     //   })
     //   .setLngLat(this.curremtLngLat)
     //   .addTo(this.map)
+
+    this.readFromLocalStorage()
   }
 
 
   createMarker() {
-    // this.addMarker()
+
+    if (!this.map) return
+
+    const color = '#xxxxxx'.replace(/x/g, y => (Math.random() * 16 | 0).toString(16));
+    const lngLat = this.map.getCenter()
+    this.addMarker(lngLat, color)
+
   }
 
 
@@ -55,6 +75,53 @@ export class MarkersPageComponent implements AfterViewInit, OnDestroy {
     })
       .setLngLat(lngLat)
       .addTo(this.map)
+
+    this.markers.push({ color: color, marker: marker })
+
+    marker.on('dragend', () => this.saveToLocalStorage())
+  }
+
+  deleteMarker(i: number): void {
+    this.markers[i].marker.remove()
+    this.markers.splice(i, 1)
+
+  }
+
+
+  flyto(marker: Marker): void {
+    this.map?.flyTo({
+      zoom: 18,
+      center: marker.getLngLat()
+    })
+  }
+
+
+  saveToLocalStorage() {
+    const plainMarkers: PlainMarker[] = this.markers.map(({ color, marker }) => {
+      return {
+        color: color,
+        lngLat: marker.getLngLat().toArray()
+      }
+    })
+
+    localStorage.setItem('plainMarkers', JSON.stringify(plainMarkers))
+  }
+
+  readFromLocalStorage() {
+
+    const plainMarkersString = localStorage.getItem('plainMarkers') ?? '[]'
+    const plainMarkers: PlainMarker[] = JSON.parse(plainMarkersString) //!OJO!
+
+    plainMarkers.forEach(({ color, lngLat }) => {
+      const [lng, lat] = lngLat
+      const coords = new LngLat(lng, lat)
+
+      this.addMarker(coords, color)
+    });
+
+
+
+
   }
 
 

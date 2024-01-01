@@ -1,12 +1,21 @@
 <div id="map" #map></div>
 
 <ul class="list-group">
-  <li class="list-group-item color">  ??? </li>
-  <li class="list-group-item color">  ??? </li>
-  <li class="list-group-item color">  ??? </li>
-
+  <li class="list-group-item color">
+    <small> Un Click (Para Navegar)</small> <br />
+    <small> Doble Click (Para eliminar Marcador)</small>
+  </li>
+  <li
+    *ngFor="let item of markers; let i = index"
+    (dblclick)="deleteMarker(i)"
+    [ngStyle]="{ backgroundColor: item.color }"
+    (click)="flyto(item.marker)"
+    class="list-group-item color"
+  >
+    Marcador: {{ i + 1 }}
+  </li>
 </ul>
 
-<button class="btn btn-dark">
+<button (click)="createMarker()" class="btn btn-dark">
   + Agregar Marcador
 </button>

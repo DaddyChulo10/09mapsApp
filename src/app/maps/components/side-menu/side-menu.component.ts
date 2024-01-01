@@ -17,10 +17,10 @@ export class SideMenuComponent {
 
 
   public menuItems: MenuItem[] = [
-    { route: '/maps/map/fullscreen', name: 'FullScreen' },
+    { route: '/maps/map/fullscreen', name: 'Pantalla Completa' },
     { route: '/maps/map/zoom-range', name: 'Zoom Range' },
-    { route: '/maps/map/markers', name: 'Markers' },
-    { route: '/maps/map/properties', name: 'Properties' },
+    { route: '/maps/map/markers', name: 'Marcadores' },
+    { route: '/maps/map/properties', name: 'Propiedades' },
 
   ]
 
